@@ -92,7 +92,6 @@
 
     // Stylistic
     "camelcase": ["error", { "properties": "always" }],
-    "comma-dangle": ["error", "never"],
     "linebreak-style": ["error", "unix"],
     "max-depth": ["error", 3],
     "max-params": ["error", 3],
