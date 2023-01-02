@@ -1,28 +1,27 @@
 // Modules
+import Cors from "cors";
+import Mongoose from "mongoose";
 import Express, { json } from "express";
 import * as Tracing from "@sentry/tracing";
 import * as Sentry from "@sentry/node";
 
 // Common
-import { SENTRY } from "common/constants";
+import { CORS, DATABASE, SENTRY } from "common/constants";
 
 // Routers
-import RootRouter from "routers/root.router";
-
-// Helpers
-import DatabaseHelper from "helpers/database.helper";
-import CorsHelper from "helpers/cors.helper";
+import { rootRouter } from "routers/root.router";
 
 // Create Express Instance
 const app = Express();
 
-// Enable Cors
-CorsHelper.enableCors(app);
+// Configure CORS
+app.use(Cors({ origin: CORS.WHITELIST }));
 
 // Inject Sentry
-if (SENTRY.ENABLED) {
+if (SENTRY.DSN) {
   Sentry.init({
     dsn: SENTRY.DSN,
+    environment: SENTRY.ENV,
     integrations: [
       // enable HTTP calls tracing
       new Sentry.Integrations.Http({ tracing: true }),
@@ -38,12 +37,12 @@ if (SENTRY.ENABLED) {
 }
 
 // Sentry: Inject Request Handler
-if (SENTRY.ENABLED) {
+if (SENTRY.DSN) {
   app.use(Sentry.Handlers.requestHandler());
 }
 
 // Sentry: Inject Tracing Handler
-if (SENTRY.ENABLED) {
+if (SENTRY.DSN) {
   app.use(Sentry.Handlers.tracingHandler());
 }
 
@@ -51,24 +50,27 @@ if (SENTRY.ENABLED) {
 app.use(json());
 
 // Inject Routers
-app.use("/", RootRouter);
+app.use("/", rootRouter);
 
 // Sentry: Inject Error Handler
-if (SENTRY.ENABLED) {
+if (SENTRY.DSN) {
   app.use(Sentry.Handlers.errorHandler());
 }
 
+// Configure Mongoose
+Mongoose.set({ strictQuery: true });
+
 // Connect to Database
-DatabaseHelper.connect().then(
+Mongoose.connect(DATABASE.CONNECTION_STRING).then(
   () => {
     // eslint-disable-next-line no-console
     console.log(`Connected to database.`);
 
     // eslint-disable-next-line no-console
-    console.log(`Sentry is ${SENTRY.ENABLED ? "enabled" : "disabled"}.`);
+    console.log(`Sentry is ${SENTRY.DSN ? "enabled" : "disabled"}.`);
 
     // Port
-    const port = process.env.PORT || 5000;
+    const port = process.env.PORT || 5001;
 
     // Start Server
     app.listen(port, () => {
