@@ -1,16 +1,3 @@
-// Environment Variables
-const {
-  CORS_ALLOWED_DOMAINS,
-  MONGODB_CONNECTION_STRING,
-  SENTRY_ENABLED,
-  SENTRY_DSN,
-} = process.env;
-
-// Is True
-const isTrue = (value) => {
-  return value === "true";
-};
-
 // Application
 export const APP = {
   NAME: "App",
@@ -18,24 +5,16 @@ export const APP = {
 
 // CORS
 export const CORS = {
-  WHITELIST: CORS_ALLOWED_DOMAINS || [],
+  WHITELIST: process.env.APP_CORS_ALLOWED_DOMAINS,
 };
 
 // Database
 export const DATABASE = {
-  CONNECTION_STRING: MONGODB_CONNECTION_STRING,
+  CONNECTION_STRING: process.env.APP_MONGODB_CONNECTION_STRING,
 };
 
 // Sentry
 export const SENTRY = {
-  DSN: SENTRY_DSN,
-  ENABLED: isTrue(SENTRY_ENABLED),
-};
-
-// Exports
-export default {
-  APP,
-  CORS,
-  DATABASE,
-  SENTRY,
+  DSN: process.env.APP_SENTRY_DSN,
+  ENV: process.env.APP_SENTRY_ENV,
 };

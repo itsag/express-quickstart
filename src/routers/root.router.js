@@ -2,13 +2,10 @@
 import Express from "express";
 
 // Child Routers
-import ExampleRouter from "routers/example.router";
+import { miscRouter } from "routers/misc.router";
 
 // Create Router
-const rootRouter = Express.Router({ strict: true });
+export const rootRouter = Express.Router({ strict: true });
 
 // Routes
-rootRouter.use("/example", ExampleRouter);
-
-// Exports
-export default rootRouter;
+rootRouter.use("/misc", miscRouter);
